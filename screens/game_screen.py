@@ -121,6 +121,7 @@ class GameScreen(arcade.View):
                                                   separate_handler=ignore_collision)
 
     def setup_ui_play(self):
+        '''Создаёт gui элементы для экрана игры'''
         pause_button = UITextureButton(
             x=SCREEN_WIDTH - 45,
             y=SCREEN_HEIGHT - 40,
@@ -141,6 +142,7 @@ class GameScreen(arcade.View):
         self.ui_manager_play.enable()
 
     def setup_ui_pause(self):
+        '''Создаёт gui элементы для экрана паузы игры'''
         anchor_layout = UIAnchorLayout()
         box_vertical_layout = UIBoxLayout(vertical=True, space_between=70)
         box_horizontal_layout = UIBoxLayout(vertical=False, space_between=30)
@@ -166,6 +168,21 @@ class GameScreen(arcade.View):
         box_horizontal_layout.add(continue_btn)
 
         home_btn = UITextureButton(texture=arcade.load_texture(home_btn_img_path), scale=0.6)
+
+        @home_btn.event("on_click")
+        def on_click_home_button(event):
+            self.ui_manager_pause.disable()
+
+            self.ui_manager_pause.clear()
+            self.ui_manager_play.clear()
+
+            from screens.menu_screen import MenuScreen
+            menu_view = MenuScreen()
+            menu_view.setup()
+            self.window.show_view(menu_view)
+
+            print('HOME')
+
         box_horizontal_layout.add(home_btn)
 
         box_vertical_layout.add(box_horizontal_layout)
