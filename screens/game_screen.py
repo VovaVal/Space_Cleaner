@@ -22,6 +22,7 @@ class GameScreen(arcade.View):
 
         self.level = level
         self.pause = False
+        self.game_end = False
         self.emitters = []
         self.score = 0.0
 
@@ -37,6 +38,7 @@ class GameScreen(arcade.View):
 
         self.ui_manager_play = UIManager()
         self.ui_manager_pause = UIManager()
+        self.ui_manager_end = UIManager()
 
     def setup(self):
         self.keys_pressed = set()
@@ -156,7 +158,9 @@ class GameScreen(arcade.View):
         )
         box_vertical_layout.add(label)
 
-        continue_btn = UITextureButton(texture=arcade.load_texture(continue_btn_img_path), scale=0.6)
+        continue_btn = UITextureButton(
+            texture=arcade.load_texture(continue_btn_img_path), scale=0.6
+        )
 
         @continue_btn.event("on_click")
         def on_click_continue_button(event):
@@ -167,14 +171,19 @@ class GameScreen(arcade.View):
 
         box_horizontal_layout.add(continue_btn)
 
-        home_btn = UITextureButton(texture=arcade.load_texture(home_btn_img_path), scale=0.6)
+        home_btn = UITextureButton(
+            texture=arcade.load_texture(home_btn_img_path), scale=0.6
+        )
 
         @home_btn.event("on_click")
         def on_click_home_button(event):
             self.ui_manager_pause.disable()
+            self.ui_manager_play.disable()
+            self.ui_manager_end.disable()
 
             self.ui_manager_pause.clear()
             self.ui_manager_play.clear()
+            self.ui_manager_end.clear()
 
             from screens.menu_screen import MenuScreen
             menu_view = MenuScreen()
@@ -191,6 +200,74 @@ class GameScreen(arcade.View):
         self.ui_manager_pause.add(anchor_layout)
 
         self.ui_manager_pause.enable()
+
+    def setup_ui_game_end(self):
+        '''Создаёт gui элементы для экрана окончания игры'''
+        anchor_layout = UIAnchorLayout()
+        box_vertical_layout = UIBoxLayout(vertical=True, space_between=70)
+        box_horizontal_layout = UIBoxLayout(vertical=False, space_between=30)
+
+        label = UILabel(
+            text='Last Records:',
+            font_size=64,
+            text_color=arcade.color.WHITE,
+            width=350,
+            align='center'
+        )
+        box_vertical_layout.add(label)
+
+        home_btn = UITextureButton(
+            texture=arcade.load_texture(home_btn_img_path), scale=0.6
+        )
+
+        @home_btn.event("on_click")
+        def on_click_home_button(event):
+            self.ui_manager_pause.disable()
+            self.ui_manager_play.disable()
+            self.ui_manager_end.disable()
+
+            self.ui_manager_pause.clear()
+            self.ui_manager_play.clear()
+            self.ui_manager_end.clear()
+
+            from screens.menu_screen import MenuScreen
+            menu_view = MenuScreen()
+            menu_view.setup()
+            self.window.show_view(menu_view)
+
+            print('HOME')
+
+        box_horizontal_layout.add(home_btn)
+
+        play_again_btn = UITextureButton(
+            texture=arcade.load_texture(play_again_btn_img_path),
+            scale=0.6
+        )
+
+        @play_again_btn.event("on_click")
+        def on_click_play_again_button(event):
+            self.ui_manager_pause.disable()
+            self.ui_manager_play.disable()
+            self.ui_manager_end.disable()
+
+            self.ui_manager_pause.clear()
+            self.ui_manager_play.clear()
+            self.ui_manager_end.clear()
+
+            game_view = GameScreen(self.level)
+            game_view.setup()
+            self.window.show_view(game_view)
+
+            print('PLAY AGAIN')
+
+        box_horizontal_layout.add(play_again_btn)
+
+        box_vertical_layout.add(box_horizontal_layout)
+        anchor_layout.add(box_vertical_layout)
+
+        self.ui_manager_end.add(anchor_layout)
+
+        self.ui_manager_end.enable()
 
     def on_draw(self):
         self.clear()
@@ -242,12 +319,16 @@ class GameScreen(arcade.View):
         for emitter in self.emitters:
             emitter.draw()
 
-        if self.pause:
+        if self.pause or self.game_end:
             arcade.draw_texture_rect(
                 self.full_blackout,
                 arcade.rect.XYWH(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT)
             )
-            self.ui_manager_pause.draw()
+
+            if self.game_end:
+                self.ui_manager_end.draw()
+            elif self.pause:
+                self.ui_manager_pause.draw()
 
     def make_explosion_emitter(self, x: float, y: float):
         """Создаёт встроенный Emitter для взрыва."""
@@ -320,6 +401,11 @@ class GameScreen(arcade.View):
                 trash.remove_from_sprite_lists()
                 self.emitters.append(self.make_explosion_emitter(trash.center_x, trash.center_y))
                 self.player.lives -= trash.get_lives()
+
+                if self.player.lives == 0:
+                    self.setup_ui_game_end()
+                    self.game_end = True
+                    self.pause = True
 
                 self.score += (trash.get_class() + 1) * 100
 
