@@ -2,6 +2,7 @@ import random
 
 import arcade
 from arcade import PymunkPhysicsEngine
+from arcade.gui import UIManager, UITextureButton, UILabel, UIAnchorLayout, UIBoxLayout
 from arcade.particles import Emitter, EmitBurst, FadeParticle
 
 from game_resorces import *
@@ -34,6 +35,9 @@ class GameScreen(arcade.View):
         arcade.schedule(self.create_bullet, 1.0)
         arcade.schedule(self.create_trash, 3.0)
 
+        self.ui_manager_play = UIManager()
+        self.ui_manager_pause = UIManager()
+
     def setup(self):
         self.keys_pressed = set()
 
@@ -57,6 +61,8 @@ class GameScreen(arcade.View):
             elasticity=0.0,
             collision_type='player'
         )
+
+        self.setup_ui_play()
 
         self.score_text = arcade.Text(
             'Score: 0',
@@ -114,6 +120,46 @@ class GameScreen(arcade.View):
                                                   post_handler=ignore_collision,
                                                   separate_handler=ignore_collision)
 
+    def setup_ui_play(self):
+        pause_button = UITextureButton(
+            x=SCREEN_WIDTH - 45,
+            y=SCREEN_HEIGHT - 40,
+            width=33,
+            height=29,
+            texture=self.pause_btn_img
+        )
+
+        @pause_button.event("on_click")
+        def on_click_pause_button(event):
+            self.pause = True
+            self.ui_manager_play.disable()
+            self.setup_ui_pause()
+            print('PAUSE')
+
+        self.ui_manager_play.add(pause_button)
+
+        self.ui_manager_play.enable()
+
+    def setup_ui_pause(self):
+        anchor_layout = UIAnchorLayout()
+        box_vertical_layout = UIBoxLayout(vertical=True, space_between=70)
+        box_horizontal_layout = UIBoxLayout(vertical=False, space_between=30)
+
+        label = UILabel(
+            text='PAUSE',
+            font_size=64,
+            text_color=arcade.color.WHITE,
+            width=300,
+            align='center'
+        )
+        box_vertical_layout.add(label)
+        box_vertical_layout.add(box_horizontal_layout)
+        anchor_layout.add(box_vertical_layout)
+
+        self.ui_manager_pause.add(anchor_layout)
+
+        self.ui_manager_pause.enable()
+
     def on_draw(self):
         self.clear()
 
@@ -149,10 +195,7 @@ class GameScreen(arcade.View):
                 arcade.rect.XYWH(SCREEN_WIDTH / 2 + 40, SCREEN_HEIGHT - 25, 33, 29)
             )
 
-        arcade.draw_texture_rect(
-            self.pause_btn_img,
-            arcade.rect.XYWH(SCREEN_WIDTH - 40, SCREEN_HEIGHT - 25, 33, 29)
-        )
+        self.ui_manager_play.draw()
 
         self.score_text = arcade.Text(
             f'Score: {int(self.score)}',
@@ -166,6 +209,13 @@ class GameScreen(arcade.View):
 
         for emitter in self.emitters:
             emitter.draw()
+
+        if self.pause:
+            arcade.draw_texture_rect(
+                self.full_blackout,
+                arcade.rect.XYWH(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT)
+            )
+            self.ui_manager_pause.draw()
 
     def make_explosion_emitter(self, x: float, y: float):
         """Создаёт встроенный Emitter для взрыва."""
@@ -192,6 +242,9 @@ class GameScreen(arcade.View):
 
     def create_bullet(self, delta: float):
         '''Создаёт пулю'''
+        if self.pause:
+            return
+
         self.bullet_sound.play()
         bullet = Bullet(self.player.center_x, self.player.center_y + self.player.height / 2)
         self.bullet_list.append(bullet)
@@ -208,6 +261,9 @@ class GameScreen(arcade.View):
 
     def create_trash(self, delta: float):
         '''Создаёт мусор'''
+        if self.pause:
+            return
+
         trash = Trash(self.level)
         self.trash_list.append(trash)
 
@@ -219,6 +275,7 @@ class GameScreen(arcade.View):
             friction=0.0,
             collision_type="trash"
         )
+
         self.physics_engine.set_velocity(trash, (0, -200))
 
     def check_for_collision(self):
@@ -260,14 +317,17 @@ class GameScreen(arcade.View):
 
         self.check_for_collision()
 
-        self.score += delta_time * 10
+        self.ui_manager_play.on_update(delta_time)
+
+        if not self.pause:
+            self.score += delta_time * 10
 
         force_magnitude = 1200
         stop_force_multiplier = 5.0
 
         vx, vy = self.player.velocity
 
-        if self.dragging:
+        if self.dragging and not self.pause:
 
             dx = self.mouse_x - self.player.center_x
             dy = self.mouse_y - self.player.center_y
@@ -285,7 +345,7 @@ class GameScreen(arcade.View):
                 # Остановка
                 self.physics_engine.set_velocity(self.player, (0, 0))
 
-        elif self.keys_pressed:
+        elif self.keys_pressed and not self.pause:
             target_vx, target_vy = 0, 0
 
             if arcade.key.LEFT in self.keys_pressed or arcade.key.A in self.keys_pressed:
@@ -318,7 +378,8 @@ class GameScreen(arcade.View):
             if emitter.can_reap():
                 self.emitters.remove(emitter)
 
-        self.physics_engine.step()
+        if not self.pause:
+            self.physics_engine.step()
 
     def on_key_press(self, symbol: int, modifiers: int):
         self.keys_pressed.add(symbol)
