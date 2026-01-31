@@ -16,6 +16,7 @@ class GameScreen(arcade.View):
         self.lives_img = arcade.load_texture(lives_img_path)
         self.pause_btn_img = arcade.load_texture(pause_btn_img_path)
         self.level = level
+        self.pause = False
 
         self.dragging = False
         self.mouse_x = 0
@@ -121,17 +122,17 @@ class GameScreen(arcade.View):
         if self.player.lives > 0:
             arcade.draw_texture_rect(
                 self.lives_img,
-                arcade.rect.XYWH(SCREEN_WIDTH - 140, SCREEN_HEIGHT - 25,33, 29)
+                arcade.rect.XYWH(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 25,33, 29)
             )
         if self.player.lives > 1:
             arcade.draw_texture_rect(
                 self.lives_img,
-                arcade.rect.XYWH(SCREEN_WIDTH - 100, SCREEN_HEIGHT - 25, 33, 29)
+                arcade.rect.XYWH(SCREEN_WIDTH / 2 - 40, SCREEN_HEIGHT - 25, 33, 29)
             )
         if self.player.lives > 2:
             arcade.draw_texture_rect(
                 self.lives_img,
-                arcade.rect.XYWH(SCREEN_WIDTH - 180, SCREEN_HEIGHT - 25, 33, 29)
+                arcade.rect.XYWH(SCREEN_WIDTH / 2 + 40, SCREEN_HEIGHT - 25, 33, 29)
             )
 
         arcade.draw_texture_rect(
