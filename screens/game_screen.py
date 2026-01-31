@@ -4,6 +4,7 @@ import arcade
 from arcade import PymunkPhysicsEngine
 
 from game_resorces import *
+from explosion_emitter import ExplosionEmitter
 
 
 class GameScreen(arcade.View):
@@ -17,6 +18,7 @@ class GameScreen(arcade.View):
         self.pause_btn_img = arcade.load_texture(pause_btn_img_path)
         self.level = level
         self.pause = False
+        self.explosions = []
 
         self.dragging = False
         self.mouse_x = 0
@@ -30,6 +32,7 @@ class GameScreen(arcade.View):
 
     def setup(self):
         self.keys_pressed = set()
+        self.explosions = []
 
         self.player_list = arcade.SpriteList()
         self.player = Ship()
@@ -140,6 +143,15 @@ class GameScreen(arcade.View):
             arcade.rect.XYWH(SCREEN_WIDTH - 40, SCREEN_HEIGHT - 25, 33, 29)
         )
 
+        for explosion in self.explosions:
+            explosion.draw()
+
+    def create_explosion(self, x, y):
+        """Создает взрыв в указанных координатах"""
+        explosion = ExplosionEmitter(x, y)
+        self.explosions.append(explosion)
+        return explosion
+
     def create_bullet(self, delta: float):
         '''Создаёт пулю'''
         self.bullet_sound.play()
@@ -179,6 +191,7 @@ class GameScreen(arcade.View):
 
                 self.destroy_sound.play()
                 trash.remove_from_sprite_lists()
+                self.create_explosion(trash.center_x, trash.center_y)
                 self.player.lives -= trash.get_lives()
 
         for bullet in self.bullet_list:
@@ -190,6 +203,7 @@ class GameScreen(arcade.View):
                 if not trash.is_alive():
                     self.destroy_sound.play()
                     trash.remove_from_sprite_lists()
+                    self.create_explosion(trash.center_x, trash.center_y)
 
                 else:
                     vx, vy = self.physics_engine.get_physics_object(trash).body.velocity
@@ -252,6 +266,11 @@ class GameScreen(arcade.View):
             speed = (vx ** 2 + vy ** 2) ** 0.5
             if speed < 5:
                 self.physics_engine.set_velocity(self.player, (0, 0))
+
+        for explosion in self.explosions[:]:
+            explosion.update(delta_time)
+            if not explosion.is_active:
+                self.explosions.remove(explosion)
 
         self.physics_engine.step()
 
