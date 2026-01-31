@@ -286,6 +286,10 @@ class GameScreen(arcade.View):
         for emitter in self.emitters[:]:
             emitter.update()
 
+        for emitter in self.emitters[:]:
+            if emitter.can_reap():
+                self.emitters.remove(emitter)
+
         self.physics_engine.step()
 
     def on_key_press(self, symbol: int, modifiers: int):
