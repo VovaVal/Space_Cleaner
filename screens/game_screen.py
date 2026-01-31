@@ -19,6 +19,7 @@ class GameScreen(arcade.View):
         self.level = level
         self.pause = False
         self.emitters = []
+        self.score = 0.0
 
         self.dragging = False
         self.mouse_x = 0
@@ -52,6 +53,14 @@ class GameScreen(arcade.View):
             friction=0.0,
             elasticity=0.0,
             collision_type='player'
+        )
+
+        self.score_text = arcade.Text(
+            'Score: 0',
+            130, SCREEN_HEIGHT - 40,
+            color=arcade.color.BLACK,
+            font_size=25,
+            anchor_x='center'
         )
 
         wall_thickness = 1
@@ -142,6 +151,16 @@ class GameScreen(arcade.View):
             arcade.rect.XYWH(SCREEN_WIDTH - 40, SCREEN_HEIGHT - 25, 33, 29)
         )
 
+        self.score_text = arcade.Text(
+            f'Score: {int(self.score)}',
+            130, SCREEN_HEIGHT - 40,
+            color=arcade.color.BLACK,
+            font_size=25,
+            anchor_x='center'
+        )
+
+        self.score_text.draw()
+
         for emitter in self.emitters:
             emitter.draw()
 
@@ -210,6 +229,8 @@ class GameScreen(arcade.View):
                 self.emitters.append(self.make_explosion_emitter(trash.center_x, trash.center_y))
                 self.player.lives -= trash.get_lives()
 
+                self.score += (trash.get_class() + 1) * 100
+
         for bullet in self.bullet_list:
             trash_hit_list = arcade.check_for_collision_with_list(bullet, self.trash_list)
 
@@ -220,6 +241,8 @@ class GameScreen(arcade.View):
                     self.destroy_sound.play()
                     trash.remove_from_sprite_lists()
                     self.emitters.append(self.make_explosion_emitter(trash.center_x, trash.center_y))
+
+                    self.score += (trash.get_class() + 1) * 100
 
                 else:
                     vx, vy = self.physics_engine.get_physics_object(trash).body.velocity
@@ -233,6 +256,8 @@ class GameScreen(arcade.View):
         self.trash_list.update()
 
         self.check_for_collision()
+
+        self.score += delta_time * 10
 
         force_magnitude = 1200
         stop_force_multiplier = 5.0
@@ -357,3 +382,7 @@ class Trash(arcade.Sprite):
     def get_lives(self):
         '''Возвращает жизни мусора'''
         return self.lives
+
+    def get_class(self):
+        '''Возвращает класс мусора'''
+        return self.trash_class
