@@ -12,10 +12,13 @@ class GameScreen(arcade.View):
         super().__init__()
 
         self.camera = arcade.camera.Camera2D()
+
         self.background = arcade.load_texture(background_img_path)
         self.top_blackout = arcade.load_texture(blackout_top_img_path)
+        self.full_blackout = arcade.load_texture(full_blackout_img_path)
         self.lives_img = arcade.load_texture(lives_img_path)
         self.pause_btn_img = arcade.load_texture(pause_btn_img_path)
+
         self.level = level
         self.pause = False
         self.emitters = []
@@ -65,13 +68,13 @@ class GameScreen(arcade.View):
 
         wall_thickness = 1
         walls = [
-            # низ
+            # нижняя стена
             arcade.SpriteSolidColor(SCREEN_WIDTH + wall_thickness * 2, wall_thickness, color=(0, 0, 0, 0)),
-            # вверх
+            # вверхняя стена
             arcade.SpriteSolidColor(SCREEN_WIDTH + wall_thickness * 2, wall_thickness, color=(0, 0, 0, 0)),
-            # левое
+            # левая стена
             arcade.SpriteSolidColor(wall_thickness, SCREEN_HEIGHT + wall_thickness * 2, color=(0, 0, 0, 0)),
-            # правое
+            # правая стена
             arcade.SpriteSolidColor(wall_thickness, SCREEN_HEIGHT + wall_thickness * 2, color=(0, 0, 0, 0)),
         ]
 

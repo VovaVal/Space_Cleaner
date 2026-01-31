@@ -17,6 +17,7 @@ trash2_img_path = 'assets/textures/trash_2.png'
 lives_img_path = 'assets/textures/life.png'
 blackout_top_img_path = 'assets/textures/blackout_top.png'
 pause_btn_img_path = 'assets/textures/pause_icon.png'
+full_blackout_img_path = 'assets/textures/blackout_full.png'
 
 bullet_sound_path = 'assets/sounds/shoot.mp3'
 destroy_sound_path = 'assets/sounds/destroy.mp3'
