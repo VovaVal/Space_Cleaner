@@ -9,8 +9,12 @@ from game_resorces import *
 class GameScreen(arcade.View):
     def __init__(self, level: int):
         super().__init__()
+
         self.camera = arcade.camera.Camera2D()
         self.background = arcade.load_texture(background_img_path)
+        self.top_blackout = arcade.load_texture(blackout_top_img_path)
+        self.lives_img = arcade.load_texture(lives_img_path)
+        self.pause_btn_img = arcade.load_texture(pause_btn_img_path)
         self.level = level
 
         self.dragging = False
@@ -97,14 +101,43 @@ class GameScreen(arcade.View):
 
     def on_draw(self):
         self.clear()
+
         self.camera.use()
+
         arcade.draw_texture_rect(
             self.background,
             arcade.rect.XYWH(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT)
         )
+
         self.player_list.draw()
         self.bullet_list.draw()
         self.trash_list.draw()
+
+        arcade.draw_texture_rect(
+            self.top_blackout,
+            arcade.rect.XYWH(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 25, SCREEN_WIDTH, 50)
+        )
+
+        if self.player.lives > 0:
+            arcade.draw_texture_rect(
+                self.lives_img,
+                arcade.rect.XYWH(SCREEN_WIDTH - 140, SCREEN_HEIGHT - 25,33, 29)
+            )
+        if self.player.lives > 1:
+            arcade.draw_texture_rect(
+                self.lives_img,
+                arcade.rect.XYWH(SCREEN_WIDTH - 100, SCREEN_HEIGHT - 25, 33, 29)
+            )
+        if self.player.lives > 2:
+            arcade.draw_texture_rect(
+                self.lives_img,
+                arcade.rect.XYWH(SCREEN_WIDTH - 180, SCREEN_HEIGHT - 25, 33, 29)
+            )
+
+        arcade.draw_texture_rect(
+            self.pause_btn_img,
+            arcade.rect.XYWH(SCREEN_WIDTH - 40, SCREEN_HEIGHT - 25, 33, 29)
+        )
 
     def create_bullet(self, delta: float):
         '''Создаёт пулю'''
@@ -124,7 +157,7 @@ class GameScreen(arcade.View):
 
     def create_trash(self, delta: float):
         '''Создаёт мусор'''
-        trash = Trash()
+        trash = Trash(self.level)
         self.trash_list.append(trash)
 
         self.physics_engine.add_sprite(
@@ -144,7 +177,7 @@ class GameScreen(arcade.View):
             for trash in trash_ship_hit_list:
 
                 self.destroy_sound.play()
-                self.physics_engine.remove_sprite(trash)
+                trash.remove_from_sprite_lists()
                 self.player.lives -= trash.get_lives()
 
         for bullet in self.bullet_list:
@@ -159,7 +192,7 @@ class GameScreen(arcade.View):
 
                 else:
                     vx, vy = self.physics_engine.get_physics_object(trash).body.velocity
-                    self.physics_engine.set_velocity(trash, (vx, -200))
+                    self.physics_engine.set_velocity(trash, (0, -200))
 
                 bullet.remove_from_sprite_lists()
 
@@ -260,10 +293,14 @@ class Bullet(arcade.Sprite):
 
 
 class Trash(arcade.Sprite):
-    def __init__(self):
+    def __init__(self, level: int):
         super().__init__()
 
-        self.trash_class = 1 if random.random() > 0.7 else 0  # выбираем класс мусора
+        if level == 1:
+            self.trash_class = 0
+
+        else:
+            self.trash_class = 1 if random.random() > 0.7 else 0  # выбираем класс мусора
         self.texture = arcade.load_texture(trash1_img_path) if self.trash_class == 0\
             else arcade.load_texture(trash2_img_path)
         self.scale = 0.8
