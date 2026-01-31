@@ -153,6 +153,21 @@ class GameScreen(arcade.View):
             align='center'
         )
         box_vertical_layout.add(label)
+
+        continue_btn = UITextureButton(texture=arcade.load_texture(continue_btn_img_path), scale=0.6)
+
+        @continue_btn.event("on_click")
+        def on_click_continue_button(event):
+            self.pause = False
+            self.ui_manager_pause.disable()
+            self.setup_ui_play()
+            print('CONTINUE')
+
+        box_horizontal_layout.add(continue_btn)
+
+        home_btn = UITextureButton(texture=arcade.load_texture(home_btn_img_path), scale=0.6)
+        box_horizontal_layout.add(home_btn)
+
         box_vertical_layout.add(box_horizontal_layout)
         anchor_layout.add(box_vertical_layout)
 
