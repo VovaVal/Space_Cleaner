@@ -27,6 +27,7 @@ class MenuScreen(arcade.View):
         self.manager.add(self.anchor_layout)
 
         self.background = arcade.load_texture(background_img_path)
+        self.click_btn_sound = arcade.load_sound(btn_click_sound_path)
 
     def setup_widgets(self):
         label = UILabel(text='Space Cleaner', font_size=48, text_color=arcade.color.WHITE, align='center')
@@ -86,6 +87,8 @@ class MenuScreen(arcade.View):
 
     def open_settings(self):
         '''Открывает окно настроек'''
+        self.click_btn_sound.play()
+
         self.manager.disable()
         self.manager.clear()
 
@@ -95,6 +98,8 @@ class MenuScreen(arcade.View):
 
     def start_level(self, level: int):
         '''Начинает игру по заданному уровню сложности'''
+        self.click_btn_sound.play()
+
         self.manager.disable()
         self.manager.clear()
 

@@ -61,6 +61,7 @@ class GameScreen(arcade.View):
 
         self.bullet_sound = arcade.load_sound(bullet_sound_path)
         self.destroy_sound = arcade.load_sound(destroy_sound_path)
+        self.click_sound = arcade.load_sound(btn_click_sound_path)
 
         arcade.schedule(self.create_bullet, 1.0)
         arcade.schedule(self.create_trash, self.trash_schedule)
@@ -176,6 +177,8 @@ class GameScreen(arcade.View):
 
         @pause_button.event("on_click")
         def on_click_pause_button(event):
+            self.click_sound.play()
+
             self.pause = True
             self.ui_manager_play.disable()
             self.setup_ui_pause()
@@ -206,6 +209,8 @@ class GameScreen(arcade.View):
 
         @continue_btn.event("on_click")
         def on_click_continue_button(event):
+            self.click_sound.play()
+
             self.pause = False
             self.ui_manager_pause.disable()
             self.setup_ui_play()
@@ -219,6 +224,8 @@ class GameScreen(arcade.View):
 
         @home_btn.event("on_click")
         def on_click_home_button(event):
+            self.click_sound.play()
+
             self.ui_manager_pause.disable()
             self.ui_manager_play.disable()
             self.ui_manager_end.disable()
@@ -310,6 +317,8 @@ class GameScreen(arcade.View):
 
         @home_btn.event("on_click")
         def on_click_home_button(event):
+            self.click_sound.play()
+
             self.ui_manager_pause.disable()
             self.ui_manager_play.disable()
             self.ui_manager_end.disable()
@@ -334,6 +343,8 @@ class GameScreen(arcade.View):
 
         @play_again_btn.event("on_click")
         def on_click_play_again_button(event):
+            self.click_sound.play()
+
             self.ui_manager_pause.disable()
             self.ui_manager_play.disable()
             self.ui_manager_end.disable()
