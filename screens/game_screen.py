@@ -33,6 +33,19 @@ class GameScreen(arcade.View):
         self.emitters = []
         self.score = 0.0
         self.db = db
+        self.trash_velocity = None
+        self.trash_schedule = None  # как часто будет появляться мусор
+
+        match self.level:
+            case 1:
+                self.trash_velocity = LEVEL1_TRASH_VELOCITY
+                self.trash_schedule = LEVEL1_TRASH_SCHEDULE
+            case 2:
+                self.trash_velocity = LEVEL2_TRASH_VELOCITY
+                self.trash_schedule = LEVEL2_TRASH_SCHEDULE
+            case _:
+                self.trash_velocity = LEVEL3_TRASH_VELOCITY
+                self.trash_schedule = LEVEL3_TRASH_SCHEDULE
 
         self.dragging = False
         self.mouse_x = 0
@@ -42,7 +55,7 @@ class GameScreen(arcade.View):
         self.destroy_sound = arcade.load_sound(destroy_sound_path)
 
         arcade.schedule(self.create_bullet, 1.0)
-        arcade.schedule(self.create_trash, 3.0)
+        arcade.schedule(self.create_trash, self.trash_schedule)
 
         self.ui_manager_play = UIManager()
         self.ui_manager_pause = UIManager()
@@ -461,7 +474,7 @@ class GameScreen(arcade.View):
             collision_type="trash"
         )
 
-        self.physics_engine.set_velocity(trash, (0, -200))
+        self.physics_engine.set_velocity(trash, (0, -self.trash_velocity))
 
     def check_for_collision(self):
         '''Проверяет коллизии'''
@@ -501,7 +514,7 @@ class GameScreen(arcade.View):
 
                 else:
                     vx, vy = self.physics_engine.get_physics_object(trash).body.velocity
-                    self.physics_engine.set_velocity(trash, (0, -200))
+                    self.physics_engine.set_velocity(trash, (0, -self.trash_velocity))
 
                 bullet.remove_from_sprite_lists()
 

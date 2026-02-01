@@ -26,3 +26,11 @@ bullet_sound_path = 'assets/sounds/shoot.wav'
 destroy_sound_path = 'assets/sounds/destroy.wav'
 btn_click_sound_path = 'assets/sounds/btn_click.wav'
 background_music_sound_path = 'assets/sounds/background_music.wav'
+
+LEVEL1_TRASH_VELOCITY = 200
+LEVEL2_TRASH_VELOCITY = 300
+LEVEL3_TRASH_VELOCITY = 350
+
+LEVEL1_TRASH_SCHEDULE = 3.0
+LEVEL2_TRASH_SCHEDULE = 2.5
+LEVEL3_TRASH_SCHEDULE = 2.0
