@@ -14,7 +14,14 @@ class GameScreen(arcade.View):
 
         self.camera = arcade.camera.Camera2D()
 
-        self.background = arcade.load_texture(background_img_path)
+        self.background_speed = 2
+
+        self.background1 = arcade.load_texture(background_img_path)
+        self.background1_y = SCREEN_HEIGHT / 2
+
+        self.background2 = arcade.load_texture(background_img_path)
+        self.background2_y = SCREEN_HEIGHT / 2 + SCREEN_HEIGHT
+
         self.top_blackout = arcade.load_texture(blackout_top_img_path)
         self.full_blackout = arcade.load_texture(full_blackout_img_path)
         self.lives_img = arcade.load_texture(lives_img_path)
@@ -122,6 +129,19 @@ class GameScreen(arcade.View):
                                                   pre_handler=ignore_collision,
                                                   post_handler=ignore_collision,
                                                   separate_handler=ignore_collision)
+
+    def move_backgrounds(self):
+        '''Изменяет координаты Y для двух фонов для иллюзии полёта'''
+        if self.pause:
+            return
+
+        self.background1_y -= self.background_speed
+        self.background2_y -= self.background_speed
+
+        if self.background1_y == -SCREEN_HEIGHT / 2:
+            self.background1_y = SCREEN_HEIGHT / 2 + SCREEN_HEIGHT
+        if self.background2_y == -SCREEN_HEIGHT / 2:
+            self.background2_y = SCREEN_HEIGHT / 2 + SCREEN_HEIGHT
 
     def setup_ui_play(self):
         '''Создаёт gui элементы для экрана игры'''
@@ -323,8 +343,12 @@ class GameScreen(arcade.View):
         self.camera.use()
 
         arcade.draw_texture_rect(
-            self.background,
-            arcade.rect.XYWH(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT)
+            self.background1,
+            arcade.rect.XYWH(SCREEN_WIDTH / 2, self.background1_y, SCREEN_WIDTH, SCREEN_HEIGHT)
+        )
+        arcade.draw_texture_rect(
+            self.background2,
+            arcade.rect.XYWH(SCREEN_WIDTH / 2, self.background2_y, SCREEN_WIDTH, SCREEN_HEIGHT)
         )
 
         self.player_list.draw()
@@ -487,6 +511,8 @@ class GameScreen(arcade.View):
         self.trash_list.update()
 
         self.check_for_collision()
+
+        self.move_backgrounds()
 
         self.ui_manager_play.on_update(delta_time)
 
