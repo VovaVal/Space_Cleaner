@@ -4,6 +4,7 @@ from arcade.gui import UIManager, UIAnchorLayout, UIBoxLayout, UILabel, UITextur
 from game_resorces import *
 from screens.game_screen import GameScreen
 from database import DataBase
+from screens.settings_screen import SettingsScreen
 
 
 class MenuScreen(arcade.View):
@@ -53,24 +54,47 @@ class MenuScreen(arcade.View):
             texture=texture_normal3,
             scale=1.0
         )
+
         buttons_box.add(level1_btn)
         buttons_box.add(level2_btn)
         buttons_box.add(level3_btn)
 
-        main_box = UIBoxLayout(vertical=True, space_between=100)
+        settings_box = UIBoxLayout(vertical=True, space_between=50)
+
+        texture_settings = arcade.load_texture(settings_btn_img_path)
+        settings_btn = UITextureButton(
+            texture=texture_settings,
+            scale=1.0
+        )
+
+        settings_box.add(settings_btn)
+
+        main_box = UIBoxLayout(vertical=True, space_between=70)
         main_box.add(title_box)
         main_box.add(buttons_box)
+        main_box.add(settings_box)
 
         self.box_layout.add(main_box)
 
         level1_btn.on_click = lambda event: self.start_level(level=1)
         level2_btn.on_click = lambda event: self.start_level(level=2)
         level3_btn.on_click = lambda event: self.start_level(level=3)
+        settings_btn.on_click = lambda event: self.open_settings()
 
     def setup(self):
         pass
 
+    def open_settings(self):
+        '''Открывает окно настроек'''
+        self.manager.disable()
+        self.manager.clear()
+
+        settings_view = SettingsScreen()
+        settings_view.setup()
+        self.window.show_view(settings_view)
+
     def start_level(self, level: int):
+        '''Начинает игру по заданному уровню сложности'''
         self.manager.disable()
         self.manager.clear()
 
@@ -83,8 +107,10 @@ class MenuScreen(arcade.View):
 
         self.camera.use()
 
-        arcade.draw_texture_rect(self.background, arcade.rect.XYWH(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
-                                                              SCREEN_WIDTH, SCREEN_HEIGHT))
+        arcade.draw_texture_rect(
+            self.background,
+            arcade.rect.XYWH(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT)
+        )
         self.manager.draw()
 
     def on_update(self, delta_time: float) -> bool | None:

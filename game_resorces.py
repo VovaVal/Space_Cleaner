@@ -21,6 +21,7 @@ full_blackout_img_path = 'assets/textures/blackout_full.png'
 continue_btn_img_path = 'assets/textures/continue_btn_img.png'
 home_btn_img_path = 'assets/textures/home_btn_img.png'
 play_again_btn_img_path = 'assets/textures/play_again_btn_img.png'
+settings_btn_img_path = 'assets/textures/settings_btn_img.png'
 
 bullet_sound_path = 'assets/sounds/shoot.wav'
 destroy_sound_path = 'assets/sounds/destroy.wav'

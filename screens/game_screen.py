@@ -36,6 +36,14 @@ class GameScreen(arcade.View):
         self.trash_velocity = None
         self.trash_schedule = None  # как часто будет появляться мусор
 
+        self.camera_shake = arcade.camera.grips.ScreenShake2D(
+            self.camera.view_data,
+            max_amplitude=7.0,
+            acceleration_duration=0.1,
+            falloff_time=0.5,
+            shake_frequency=7.0,
+        )
+
         match self.level:
             case 1:
                 self.trash_velocity = LEVEL1_TRASH_VELOCITY
@@ -353,15 +361,16 @@ class GameScreen(arcade.View):
     def on_draw(self):
         self.clear()
 
+        self.camera_shake.update_camera()
         self.camera.use()
 
         arcade.draw_texture_rect(
             self.background1,
-            arcade.rect.XYWH(SCREEN_WIDTH / 2, self.background1_y, SCREEN_WIDTH, SCREEN_HEIGHT)
+            arcade.rect.XYWH(SCREEN_WIDTH / 2, self.background1_y, SCREEN_WIDTH + 20, SCREEN_HEIGHT + 20)
         )
         arcade.draw_texture_rect(
             self.background2,
-            arcade.rect.XYWH(SCREEN_WIDTH / 2, self.background2_y, SCREEN_WIDTH, SCREEN_HEIGHT)
+            arcade.rect.XYWH(SCREEN_WIDTH / 2, self.background2_y, SCREEN_WIDTH + 20, SCREEN_HEIGHT + 20)
         )
 
         self.player_list.draw()
@@ -370,8 +379,10 @@ class GameScreen(arcade.View):
 
         arcade.draw_texture_rect(
             self.top_blackout,
-            arcade.rect.XYWH(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 25, SCREEN_WIDTH, 50)
+            arcade.rect.XYWH(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 25, SCREEN_WIDTH + 20, 70)
         )
+
+        self.camera_shake.readjust_camera()
 
         if self.player.lives > 0:
             arcade.draw_texture_rect(
@@ -484,6 +495,7 @@ class GameScreen(arcade.View):
 
                 self.destroy_sound.play()
                 trash.remove_from_sprite_lists()
+                self.camera_shake.start()
                 self.emitters.append(self.make_explosion_emitter(trash.center_x, trash.center_y))
                 self.player.lives -= trash.get_lives()
 
@@ -507,6 +519,7 @@ class GameScreen(arcade.View):
 
                 if not trash.is_alive():
                     self.destroy_sound.play()
+                    self.camera_shake.start()
                     trash.remove_from_sprite_lists()
                     self.emitters.append(self.make_explosion_emitter(trash.center_x, trash.center_y))
 
@@ -519,6 +532,8 @@ class GameScreen(arcade.View):
                 bullet.remove_from_sprite_lists()
 
     def on_update(self, delta_time: float):
+        self.camera_shake.update(delta_time=delta_time)
+
         self.player_list.update()
         self.bullet_list.update()
         self.trash_list.update()
