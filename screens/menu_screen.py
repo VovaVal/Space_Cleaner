@@ -3,11 +3,14 @@ from arcade.gui import UIManager, UIAnchorLayout, UIBoxLayout, UILabel, UITextur
 
 from game_resorces import *
 from screens.game_screen import GameScreen
+from database import DataBase
 
 
 class MenuScreen(arcade.View):
     def __init__(self):
         super().__init__()
+
+        self.db = DataBase()  # подключаем/открываем базу данных
 
         self.camera = arcade.camera.Camera2D()
 
@@ -71,7 +74,7 @@ class MenuScreen(arcade.View):
         self.manager.disable()
         self.manager.clear()
 
-        game_view = GameScreen(level)
+        game_view = GameScreen(level, self.db)
         game_view.setup()
         self.window.show_view(game_view)
 

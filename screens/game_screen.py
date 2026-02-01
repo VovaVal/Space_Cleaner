@@ -9,7 +9,7 @@ from game_resorces import *
 
 
 class GameScreen(arcade.View):
-    def __init__(self, level: int):
+    def __init__(self, level: int, db):
         super().__init__()
 
         self.camera = arcade.camera.Camera2D()
@@ -25,6 +25,7 @@ class GameScreen(arcade.View):
         self.game_end = False
         self.emitters = []
         self.score = 0.0
+        self.db = db
 
         self.dragging = False
         self.mouse_x = 0
@@ -254,7 +255,7 @@ class GameScreen(arcade.View):
             self.ui_manager_play.clear()
             self.ui_manager_end.clear()
 
-            game_view = GameScreen(self.level)
+            game_view = GameScreen(self.level, self.db)
             game_view.setup()
             self.window.show_view(game_view)
 
@@ -402,7 +403,11 @@ class GameScreen(arcade.View):
                 self.emitters.append(self.make_explosion_emitter(trash.center_x, trash.center_y))
                 self.player.lives -= trash.get_lives()
 
-                if self.player.lives == 0:
+                if self.player.lives <= 0:
+                    self.db.add_score_to_level(level=self.level, score=int(self.score))
+                    scores = self.db.get_scores_for_level(level=self.level)
+                    print(scores)
+
                     self.setup_ui_game_end()
                     self.game_end = True
                     self.pause = True
