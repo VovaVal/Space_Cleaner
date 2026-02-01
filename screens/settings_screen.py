@@ -14,7 +14,7 @@ class SettingsScreen(arcade.View):
         self.manager.enable()
 
         self.anchor_layout = UIAnchorLayout()
-        self.box_layout = UIBoxLayout(vertical=True, space_between=50)
+        self.box_layout = UIBoxLayout(vertical=True, space_between=55)
 
         self.setup_widgets()
 
@@ -23,6 +23,8 @@ class SettingsScreen(arcade.View):
 
         self.background = arcade.load_texture(background_img_path)
         self.click_sound = arcade.load_sound(btn_click_sound_path)
+
+        self.chosen_img = 0  # какое изображение было выбрано
 
     def setup_widgets(self):
         title_box = UIBoxLayout(vertical=True, space_between=150)
@@ -73,18 +75,28 @@ class SettingsScreen(arcade.View):
         imgs_choice = UIBoxLayout(vertical=False, space_between=70)
 
         ship_texture1 = arcade.load_texture(ship1_img_path)
-        ship1_img = UITextureButton(
+        self.ship1_img = UITextureButton(
             texture=ship_texture1,
             scale=1.1
         )
-        imgs_choice.add(ship1_img)
+
+        @self.ship1_img.event('on_click')
+        def on_img1_click(event):
+            self.chosen_img = 0
+
+        imgs_choice.add(self.ship1_img)
 
         ship_texture2 = arcade.load_texture(ship2_img_path)
-        ship2_img = UITextureButton(
+        self.ship2_img = UITextureButton(
             texture=ship_texture2,
             scale=1.5
         )
-        imgs_choice.add(ship2_img)
+
+        @self.ship2_img.event('on_click')
+        def on_img2_click(event):
+            self.chosen_img = 1
+
+        imgs_choice.add(self.ship2_img)
 
         title_box.add(music_play_background)
         self.box_layout.add(title_box)
@@ -104,3 +116,18 @@ class SettingsScreen(arcade.View):
             arcade.rect.XYWH(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT)
         )
         self.manager.draw()
+
+        if self.chosen_img == 0:
+            arcade.draw_rect_outline(arcade.rect.XYWH(
+                self.ship1_img.center_x, self.ship1_img.center_y,
+                self.ship1_img.width, self.ship1_img.height),
+                color=arcade.color.WHITE,
+                border_width=3
+            )
+        else:
+            arcade.draw_rect_outline(arcade.rect.XYWH(
+                self.ship2_img.center_x, self.ship2_img.center_y,
+                self.ship2_img.width, self.ship2_img.height),
+                color=arcade.color.WHITE,
+                border_width=3
+            )
