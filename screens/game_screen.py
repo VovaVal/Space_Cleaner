@@ -202,10 +202,11 @@ class GameScreen(arcade.View):
 
         self.ui_manager_pause.enable()
 
-    def setup_ui_game_end(self):
+    def setup_ui_game_end(self, scores: list[int]):
         '''Создаёт gui элементы для экрана окончания игры'''
         anchor_layout = UIAnchorLayout()
-        box_vertical_layout = UIBoxLayout(vertical=True, space_between=70)
+        box_vertical_layout = UIBoxLayout(vertical=True, space_between=50)
+        box_vertical_layout_records = UIBoxLayout(vertical=True, space_between=15)
         box_horizontal_layout = UIBoxLayout(vertical=False, space_between=30)
 
         label = UILabel(
@@ -216,6 +217,51 @@ class GameScreen(arcade.View):
             align='center'
         )
         box_vertical_layout.add(label)
+
+        label1 = UILabel(
+            text=f'1) {scores[0] if len(scores) > 0 else '-'}',
+            text_color=arcade.color.WHITE,
+            font_size=30,
+            width=250,
+            align='center'
+        )
+        box_vertical_layout_records.add(label1)
+
+        label2 = UILabel(
+            text=f'2) {scores[1] if len(scores) > 1 else '-'}',
+            text_color=arcade.color.WHITE,
+            font_size=30,
+            width=250,
+            align='center'
+        )
+        box_vertical_layout_records.add(label2)
+
+        label3 = UILabel(
+            text=f'3) {scores[2] if len(scores) > 2 else '-'}',
+            text_color=arcade.color.WHITE,
+            font_size=30,
+            width=250,
+            align='center'
+        )
+        box_vertical_layout_records.add(label3)
+
+        label4 = UILabel(
+            text=f'4) {scores[3] if len(scores) > 3 else '-'}',
+            text_color=arcade.color.WHITE,
+            font_size=30,
+            width=250,
+            align='center'
+        )
+        box_vertical_layout_records.add(label4)
+
+        label5 = UILabel(
+            text=f'5) {scores[4] if len(scores) > 4 else '-'}',
+            text_color=arcade.color.WHITE,
+            font_size=30,
+            width=250,
+            align='center'
+        )
+        box_vertical_layout_records.add(label5)
 
         home_btn = UITextureButton(
             texture=arcade.load_texture(home_btn_img_path), scale=0.6
@@ -263,6 +309,7 @@ class GameScreen(arcade.View):
 
         box_horizontal_layout.add(play_again_btn)
 
+        box_vertical_layout.add(box_vertical_layout_records)
         box_vertical_layout.add(box_horizontal_layout)
         anchor_layout.add(box_vertical_layout)
 
@@ -403,16 +450,17 @@ class GameScreen(arcade.View):
                 self.emitters.append(self.make_explosion_emitter(trash.center_x, trash.center_y))
                 self.player.lives -= trash.get_lives()
 
+                self.score += (trash.get_class() + 1) * 100
+
                 if self.player.lives <= 0:
                     self.db.add_score_to_level(level=self.level, score=int(self.score))
                     scores = self.db.get_scores_for_level(level=self.level)
+                    scores = sorted([score[0] for score in scores], reverse=True)
                     print(scores)
 
-                    self.setup_ui_game_end()
+                    self.setup_ui_game_end(scores)
                     self.game_end = True
                     self.pause = True
-
-                self.score += (trash.get_class() + 1) * 100
 
         for bullet in self.bullet_list:
             trash_hit_list = arcade.check_for_collision_with_list(bullet, self.trash_list)

@@ -68,7 +68,7 @@ class DataBase:
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cur = conn.cursor()
-                score_data = cur.execute(f'''SELECT * FROM {table_name}''').fetchall()
+                score_data = cur.execute(f'''SELECT score FROM {table_name}''').fetchall()
 
             return score_data
 
