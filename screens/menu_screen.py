@@ -8,7 +8,7 @@ from screens.settings_screen import SettingsScreen
 
 
 class MenuScreen(arcade.View):
-    def __init__(self):
+    def __init__(self, player):
         super().__init__()
 
         self.db = DataBase()  # подключаем/открываем базу данных
@@ -25,6 +25,11 @@ class MenuScreen(arcade.View):
 
         self.anchor_layout.add(self.box_layout)
         self.manager.add(self.anchor_layout)
+
+        self.player_music = player
+
+        if self.db.get_data_from_settings(sound_background_music=True):
+            self.player_music.play()
 
         self.background = arcade.load_texture(background_img_path)
         self.click_btn_sound = arcade.load_sound(btn_click_sound_path)
@@ -92,18 +97,19 @@ class MenuScreen(arcade.View):
         self.manager.disable()
         self.manager.clear()
 
-        settings_view = SettingsScreen(self.db)
+        settings_view = SettingsScreen(self.db, self.player_music)
         settings_view.setup()
         self.window.show_view(settings_view)
 
     def start_level(self, level: int):
         '''Начинает игру по заданному уровню сложности'''
         self.click_btn_sound.play()
+        arcade.stop_sound(self.player_music)
 
         self.manager.disable()
         self.manager.clear()
 
-        game_view = GameScreen(level, self.db)
+        game_view = GameScreen(level, self.db, self.player_music)
         game_view.setup()
         self.window.show_view(game_view)
 

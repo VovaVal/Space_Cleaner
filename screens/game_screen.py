@@ -9,12 +9,13 @@ from game_resorces import *
 
 
 class GameScreen(arcade.View):
-    def __init__(self, level: int, db):
+    def __init__(self, level: int, db, player):
         super().__init__()
 
         self.camera = arcade.camera.Camera2D()
 
         self.background_speed = 2
+        self.player_music = player
 
         self.background1 = arcade.load_texture(background_img_path)
         self.background1_y = SCREEN_HEIGHT / 2
@@ -236,7 +237,7 @@ class GameScreen(arcade.View):
             self.ui_manager_end.clear()
 
             from screens.menu_screen import MenuScreen
-            menu_view = MenuScreen()
+            menu_view = MenuScreen(self.player_music)
             menu_view.setup()
             self.window.show_view(menu_view)
 
@@ -329,7 +330,7 @@ class GameScreen(arcade.View):
             self.ui_manager_end.clear()
 
             from screens.menu_screen import MenuScreen
-            menu_view = MenuScreen()
+            menu_view = MenuScreen(self.player_music)
             menu_view.setup()
             self.window.show_view(menu_view)
 
@@ -354,7 +355,7 @@ class GameScreen(arcade.View):
             self.ui_manager_play.clear()
             self.ui_manager_end.clear()
 
-            game_view = GameScreen(self.level, self.db)
+            game_view = GameScreen(self.level, self.db, self.player_music)
             game_view.setup()
             self.window.show_view(game_view)
 

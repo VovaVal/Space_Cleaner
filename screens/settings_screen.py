@@ -5,10 +5,11 @@ from game_resorces import *
 
 
 class SettingsScreen(arcade.View):
-    def __init__(self, db):
+    def __init__(self, db, player):
         super().__init__()
 
         self.db = db
+        self.player_music = player
 
         self.camera = arcade.camera.Camera2D()
 
@@ -46,7 +47,7 @@ class SettingsScreen(arcade.View):
 
             print('HOME')
 
-            menu_view = MenuScreen()
+            menu_view = MenuScreen(self.player_music)
             self.window.show_view(menu_view)
 
         self.manager.add(home_btn)
@@ -83,8 +84,10 @@ class SettingsScreen(arcade.View):
 
             if event.new_value == 'ON':
                 self.db.set_data_to_settings(sound_background_music=1)
+                self.player_music.play()
             elif event.new_value == 'OFF':
                 self.db.set_data_to_settings(sound_background_music=0)
+                arcade.stop_sound(self.player_music)
 
         music_play_background.add(dropdown_background_music)
 
