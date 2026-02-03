@@ -74,7 +74,7 @@ class GameScreen(arcade.View):
         self.keys_pressed = set()
 
         self.player_list = arcade.SpriteList()
-        self.player = Ship()
+        self.player = Ship(self.db)
         self.player_list.append(self.player)
 
         self.trash_list = arcade.SpriteList()
@@ -637,12 +637,13 @@ class GameScreen(arcade.View):
 
 
 class Ship(arcade.Sprite):
-    def __init__(self):
+    def __init__(self, db):
         super().__init__()
-        self.texture = arcade.load_texture(ship1_img_path)
+        self.texture = arcade.load_texture(ship1_img_path) if db.get_data_from_settings(ship_ind=True) == 0\
+            else arcade.load_texture(ship2_img_path)
         self.center_x = SCREEN_WIDTH / 2
         self.center_y = SCREEN_HEIGHT / 6
-        self.scale = 1.0
+        self.scale = 1.0 if db.get_data_from_settings(ship_ind=True) == 0 else 1.3
         self.lives = 3
 
 
