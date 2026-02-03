@@ -29,7 +29,29 @@ class SettingsScreen(arcade.View):
         self.chosen_img = self.db.get_data_from_settings(ship_ind=True)  # какое изображение было выбрано
 
     def setup_widgets(self):
-        title_box = UIBoxLayout(vertical=True, space_between=150)
+        home_texture = arcade.load_texture(home_btn_icon_img_path)
+        home_btn = UITextureButton(
+            texture=home_texture,
+            scale=1.0,
+            x=30,
+            y=SCREEN_HEIGHT - 75,
+            texture_hovered=home_texture,
+            texture_pressed=home_texture,
+            texture_disabled=home_texture
+        )
+
+        @home_btn.event('on_click')
+        def home_btn_click(event):
+            from screens.menu_screen import MenuScreen
+
+            print('HOME')
+
+            menu_view = MenuScreen()
+            self.window.show_view(menu_view)
+
+        self.manager.add(home_btn)
+
+        title_box = UIBoxLayout(vertical=True, space_between=100)
 
         label = UILabel(
             text='Settings',
