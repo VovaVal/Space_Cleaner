@@ -16,7 +16,7 @@ class SettingsScreen(arcade.View):
         self.manager.enable()
 
         self.anchor_layout = UIAnchorLayout()
-        self.box_layout = UIBoxLayout(vertical=True, space_between=55)
+        self.box_layout = UIBoxLayout(vertical=True, space_between=35)
 
         self.setup_widgets()
 
@@ -121,10 +121,45 @@ class SettingsScreen(arcade.View):
 
         imgs_choice.add(self.ship2_img)
 
+        clear_records_box = UIBoxLayout(vertical=False, space_between=30)
+
+        clear_btn_texture = arcade.load_texture(clear_btn_img_path)
+        clear_btn = UITextureButton(
+            texture=clear_btn_texture,
+            scale=0.5
+        )
+        clear_records_box.add(clear_btn)
+
+        level_dropdown = UIDropdown(
+            options=['all levels', 'level 1', 'level 2', 'level 3'],
+            width=200,
+            default=''
+        )
+
+        @clear_btn.event('on_click')
+        def on_clear_btn_click(event):
+            value = level_dropdown.value
+
+            if not value:
+                return
+
+            match value:
+                case 'all levels':
+                    self.db.clear_records(all_levels=True)
+                case 'level 1':
+                    self.db.clear_records(level=1)
+                case 'level 2':
+                    self.db.clear_records(level=2)
+                case _:
+                    self.db.clear_records(level=3)
+
+        clear_records_box.add(level_dropdown)
+
         title_box.add(music_play_background)
         self.box_layout.add(title_box)
         self.box_layout.add(shoot_sound_play)
         self.box_layout.add(imgs_choice)
+        self.box_layout.add(clear_records_box)
 
     def setup(self):
         pass

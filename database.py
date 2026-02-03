@@ -74,6 +74,18 @@ class DataBase:
 
             conn.commit()
 
+    def clear_records(self, level=None, all_levels=None):
+        '''Очищает рекорды под чистую'''
+        with sqlite3.connect(self.db_path) as conn:
+            if level == 1 or all_levels is not None:
+                conn.execute('''DELETE FROM level1''')
+            if level == 2 or all_levels is not None:
+                conn.execute('''DELETE FROM level2''')
+            if level == 3 or all_levels is not None:
+                conn.execute('''DELETE FROM level3''')
+
+            conn.commit()
+
     def get_data_from_settings(self, ship_ind=None, sound_background_music=None, sound_shoot_sound=None):
         '''Возвращает необходимые данные из настроек'''
         with sqlite3.connect(self.db_path) as conn:
