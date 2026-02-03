@@ -92,7 +92,7 @@ class MenuScreen(arcade.View):
         self.manager.disable()
         self.manager.clear()
 
-        settings_view = SettingsScreen()
+        settings_view = SettingsScreen(self.db)
         settings_view.setup()
         self.window.show_view(settings_view)
 

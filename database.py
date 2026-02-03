@@ -19,6 +19,8 @@ class DataBase:
             # Включаем поддержку внешних ключей
             conn.execute("PRAGMA foreign_keys = ON;")
 
+            cur = conn.cursor()
+
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS level1 (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -43,7 +45,47 @@ class DataBase:
                 )
             """)
 
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS settings (
+                    ship_ind INTEGER NOT NULL,
+                    sound_background_music INTEGER NOT NULL,
+                    sound_shoot_sound INTEGER NOT NULL
+                )
+            """)
+
             conn.commit()
+
+            if not cur.execute('''SELECT * FROM settings''').fetchone():  # если данные уже имеются
+                self.set_initial_data_to_settings()
+
+    def set_initial_data_to_settings(self):
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute('''INSERT INTO settings VALUES (0, 1, 1)''')
+
+    def set_data_to_settings(self, ship_ind=None, sound_background_music=None, sound_shoot_sound=None):
+        '''Добавляет/изменяет данные в настройках(1 - значит музыка будет играть, а у корабля это просто индексы скина)'''
+        with sqlite3.connect(self.db_path) as conn:
+            if ship_ind is not None:
+                conn.execute(f'''UPDATE settings SET ship_ind = {ship_ind}''')
+            if sound_background_music is not None:
+                conn.execute(f'''UPDATE settings SET sound_background_music = {sound_background_music}''')
+            if sound_shoot_sound is not None:
+                conn.execute(f'''UPDATE settings SET sound_shoot_sound = {sound_shoot_sound}''')
+
+            conn.commit()
+
+    def get_data_from_settings(self, ship_ind=None, sound_background_music=None, sound_shoot_sound=None):
+        '''Возвращает необходимые данные из настроек'''
+        with sqlite3.connect(self.db_path) as conn:
+            cur = conn.cursor()
+            data = cur.execute('''SELECT * FROM settings''').fetchall()
+
+        if ship_ind is not None:
+            return data[0][0]
+        elif sound_background_music is not None:
+            return data[0][1]
+        elif sound_shoot_sound is not None:
+            return data[0][-1]
 
     def add_score_to_level(self, level: int, score: int):
         '''Добавляет новый счёт для игры по полученному уровню'''

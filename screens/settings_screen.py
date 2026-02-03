@@ -1,12 +1,14 @@
 import arcade
-from arcade.gui import UIManager, UIAnchorLayout, UIBoxLayout, UILabel, UIDropdown, UITextureButton
+from arcade.gui import UIManager, UIAnchorLayout, UIBoxLayout, UILabel, UIDropdown, UITextureButton, UIOnChangeEvent
 
 from game_resorces import *
 
 
 class SettingsScreen(arcade.View):
-    def __init__(self):
+    def __init__(self, db):
         super().__init__()
+
+        self.db = db
 
         self.camera = arcade.camera.Camera2D()
 
@@ -24,7 +26,7 @@ class SettingsScreen(arcade.View):
         self.background = arcade.load_texture(background_img_path)
         self.click_sound = arcade.load_sound(btn_click_sound_path)
 
-        self.chosen_img = 0  # какое изображение было выбрано
+        self.chosen_img = self.db.get_data_from_settings(ship_ind=True)  # какое изображение было выбрано
 
     def setup_widgets(self):
         title_box = UIBoxLayout(vertical=True, space_between=150)
@@ -50,10 +52,19 @@ class SettingsScreen(arcade.View):
         dropdown_background_music = UIDropdown(
             options=['ON', 'OFF'],
             width=200,
-            default='ON'
+            default='ON' if self.db.get_data_from_settings(sound_background_music=True) else 'OFF'
         )
-        music_play_background.add(dropdown_background_music)
 
+        @dropdown_background_music.event()
+        def on_change(event: UIOnChangeEvent):
+            print(f'New choice = {event.new_value}')
+
+            if event.new_value == 'ON':
+                self.db.set_data_to_settings(sound_background_music=1)
+            elif event.new_value == 'OFF':
+                self.db.set_data_to_settings(sound_background_music=0)
+
+        music_play_background.add(dropdown_background_music)
 
         shoot_sound_play = UIBoxLayout(vertical=False, space_between=20)
 
@@ -68,8 +79,18 @@ class SettingsScreen(arcade.View):
         dropdown_shoot_sound = UIDropdown(
             options=['ON', 'OFF'],
             width=200,
-            default='ON'
+            default='ON' if self.db.get_data_from_settings(sound_shoot_sound=True) else 'OFF'
         )
+
+        @dropdown_shoot_sound.event()
+        def on_change(event: UIOnChangeEvent):
+            print(f'New choice = {event.new_value}')
+
+            if event.new_value == 'ON':
+                self.db.set_data_to_settings(sound_shoot_sound=1)
+            elif event.new_value == 'OFF':
+                self.db.set_data_to_settings(sound_shoot_sound=0)
+
         shoot_sound_play.add(dropdown_shoot_sound)
 
         imgs_choice = UIBoxLayout(vertical=False, space_between=70)
@@ -83,6 +104,7 @@ class SettingsScreen(arcade.View):
         @self.ship1_img.event('on_click')
         def on_img1_click(event):
             self.chosen_img = 0
+            self.db.set_data_to_settings(ship_ind=0)
 
         imgs_choice.add(self.ship1_img)
 
@@ -95,6 +117,7 @@ class SettingsScreen(arcade.View):
         @self.ship2_img.event('on_click')
         def on_img2_click(event):
             self.chosen_img = 1
+            self.db.set_data_to_settings(ship_ind=1)
 
         imgs_choice.add(self.ship2_img)
 
