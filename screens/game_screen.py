@@ -35,6 +35,7 @@ class GameScreen(arcade.View):
         self.db = db
         self.trash_velocity = None
         self.trash_schedule = None  # как часто будет появляться мусор
+        self.shoot_sound_play = bool(self.db.get_data_from_settings(sound_shoot_sound=True))
 
         self.camera_shake = arcade.camera.grips.ScreenShake2D(
             self.camera.view_data,
@@ -465,7 +466,9 @@ class GameScreen(arcade.View):
         if self.pause:
             return
 
-        self.bullet_sound.play()
+        if self.shoot_sound_play:
+            self.bullet_sound.play()
+
         bullet = Bullet(self.player.center_x, self.player.center_y + self.player.height / 2)
         self.bullet_list.append(bullet)
 
@@ -504,7 +507,9 @@ class GameScreen(arcade.View):
         if trash_ship_hit_list:
             for trash in trash_ship_hit_list:
 
-                self.destroy_sound.play()
+                if self.shoot_sound_play:
+                    self.destroy_sound.play()
+
                 trash.remove_from_sprite_lists()
                 self.camera_shake.start()
                 self.emitters.append(self.make_explosion_emitter(trash.center_x, trash.center_y))
@@ -529,7 +534,9 @@ class GameScreen(arcade.View):
                 trash.minus_live()
 
                 if not trash.is_alive():
-                    self.destroy_sound.play()
+                    if self.shoot_sound_play:
+                        self.destroy_sound.play()
+
                     self.camera_shake.start()
                     trash.remove_from_sprite_lists()
                     self.emitters.append(self.make_explosion_emitter(trash.center_x, trash.center_y))

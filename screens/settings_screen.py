@@ -16,7 +16,7 @@ class SettingsScreen(arcade.View):
         self.manager.enable()
 
         self.anchor_layout = UIAnchorLayout()
-        self.box_layout = UIBoxLayout(vertical=True, space_between=35)
+        self.box_layout = UIBoxLayout(vertical=True, space_between=50)
 
         self.setup_widgets()
 
