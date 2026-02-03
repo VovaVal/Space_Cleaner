@@ -193,7 +193,10 @@ class SettingsScreen(arcade.View):
 
         arcade.draw_texture_rect(
             self.background,
-            arcade.rect.XYWH(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT)
+            arcade.rect.XYWH(
+                SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
+                SCREEN_WIDTH, SCREEN_HEIGHT
+            )
         )
         self.manager.draw()
 
