@@ -2,6 +2,9 @@ import arcade
 from arcade.gui import UIManager, UIAnchorLayout, UIBoxLayout, UILabel, UIDropdown, UITextureButton, UIOnChangeEvent
 
 from game_resorces import *
+import matplotlib.pyplot as plt
+import pylab
+from datetime import datetime
 
 
 class SettingsScreen(arcade.View):
@@ -67,6 +70,8 @@ class SettingsScreen(arcade.View):
             self.click_sound.play()
 
             print('STATISTICS')
+
+            self.show_statistics()
 
         self.manager.add(cup_btn)
 
@@ -210,7 +215,74 @@ class SettingsScreen(arcade.View):
         pass
 
     def show_statistics(self):
-        pass
+        '''Показывает статистику(самый высокий показатель очков каждый день)'''
+        self.manager.disable()  # когда открывается статистика, то взаимодействовать с игровым окном не получится
+
+        level1, level2, level3 = self.db.get_data_for_all_levels()
+
+        level1_dict = {}
+        for score, date in level1:
+            if date not in level1_dict:
+                level1_dict[date] = []
+
+            level1_dict[date].append(score)
+
+        level2_dict = {}
+        for score, date in level2:
+            if date not in level2_dict:
+                level2_dict[date] = []
+
+            level2_dict[date].append(score)
+
+        level3_dict = {}
+        for score, date in level3:
+            if date not in level3_dict:
+                level3_dict[date] = []
+
+            level3_dict[date].append(score)
+
+        sorted_dates_level1 = sorted(level1_dict, key=lambda x: datetime.strptime(x, '%d.%m.%Y'))
+        sorted_dates_level2 = sorted(level2_dict, key=lambda x: datetime.strptime(x, '%d.%m.%Y'))
+        sorted_dates_level3 = sorted(level3_dict, key=lambda x: datetime.strptime(x, '%d.%m.%Y'))
+
+        max_score_level1 = []
+        for date in sorted_dates_level1:
+            if len(level1_dict[date]) > 0:
+                max_score_level1.append(max(level1_dict[date]))
+
+        max_score_level2 = []
+        for date in sorted_dates_level2:
+            if len(level2_dict[date]) > 0:
+                max_score_level2.append(max(level2_dict[date]))
+
+        max_score_level3 = []
+        for date in sorted_dates_level3:
+            if len(level3_dict[date]) > 0:
+                max_score_level3.append(max(level3_dict[date]))
+
+
+        plt.style.use('ggplot')
+        plt.figure(figsize=(15, 6))
+
+        pylab.subplot(1, 3, 1)
+        pylab.plot(sorted_dates_level1, max_score_level1, alpha=0.8,
+                   marker='.', markersize=10, label='Max scores')
+        pylab.title('Level 1')
+
+        pylab.subplot(1, 3, 2)
+        pylab.plot(sorted_dates_level2, max_score_level2, alpha=0.8,
+                   marker='.', markersize=10, label='Max scores')
+        pylab.title('Level 2')
+
+        pylab.subplot(1, 3, 3)
+        pylab.plot(sorted_dates_level3, max_score_level3, alpha=0.8,
+                   marker='.', markersize=10, label='Max scores')
+        pylab.title('Level 3')
+
+        pylab.show(block=True)
+
+        self.manager.enable()
+
 
     def on_draw(self) -> bool | None:
         self.clear()
