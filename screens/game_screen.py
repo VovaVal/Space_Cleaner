@@ -672,7 +672,7 @@ class Trash(arcade.Sprite):
             self.trash_class = 0
 
         else:
-            self.trash_class = 1 if random.random() > 0.7 else 0  # выбираем класс мусора
+            self.trash_class = 1 if random.random() > 0.6 else 0  # выбираем класс мусора
         self.texture = arcade.load_texture(trash1_img_path) if self.trash_class == 0\
             else arcade.load_texture(trash2_img_path)
         self.scale = 0.8
