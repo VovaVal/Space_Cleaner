@@ -24,6 +24,7 @@ play_again_btn_img_path = 'assets/textures/play_again_btn_img.png'
 settings_btn_img_path = 'assets/textures/settings_btn_img.png'
 clear_btn_img_path = 'assets/textures/clear_records_btn_img.png'
 home_btn_icon_img_path = 'assets/textures/home_btn_icon.png'
+winner_cup_btn_icon_img_path = 'assets/textures/winner_cup_btn_img.png'
 
 bullet_sound_path = 'assets/sounds/shoot.wav'
 destroy_sound_path = 'assets/sounds/destroy.wav'

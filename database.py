@@ -53,6 +53,15 @@ class DataBase:
                 )
             """)
 
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS all_levels_data (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    score INTEGER NOT NULL,
+                    level INTEGER NOT NULL,
+                    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+
             conn.commit()
 
             if not cur.execute('''SELECT * FROM settings''').fetchone():  # если данные уже имеются
@@ -109,6 +118,14 @@ class DataBase:
         with sqlite3.connect(self.db_path) as conn:
             cur = conn.cursor()
             cur.execute(f'''INSERT INTO {table_name} (score) VALUES ({score})''')
+
+            conn.commit()
+
+        self.add_score_to_all_levels(level, score)
+
+    def add_score_to_all_levels(self, level: int, score: int):
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute(f'''INSERT INTO all_levels_data (score, level) VALUES ({score}, {level})''')
 
             conn.commit()
 

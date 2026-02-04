@@ -54,6 +54,22 @@ class SettingsScreen(arcade.View):
 
         self.manager.add(home_btn)
 
+        cup_texture = arcade.load_texture(winner_cup_btn_icon_img_path)
+        cup_btn = UITextureButton(
+            texture=cup_texture,
+            scale=1.5,
+            x=SCREEN_WIDTH - 80,
+            y=SCREEN_HEIGHT - 90
+        )
+
+        @cup_btn.event('on_click')
+        def cup_btn_click(event):
+            self.click_sound.play()
+
+            print('STATISTICS')
+
+        self.manager.add(cup_btn)
+
         title_box = UIBoxLayout(vertical=True, space_between=100)
 
         label = UILabel(
@@ -191,6 +207,9 @@ class SettingsScreen(arcade.View):
         self.box_layout.add(clear_records_box)
 
     def setup(self):
+        pass
+
+    def show_statistics(self):
         pass
 
     def on_draw(self) -> bool | None:
