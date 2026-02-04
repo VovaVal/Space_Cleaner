@@ -43,6 +43,8 @@ class SettingsScreen(arcade.View):
 
         @home_btn.event('on_click')
         def home_btn_click(event):
+            self.click_sound.play()
+
             from screens.menu_screen import MenuScreen
 
             print('HOME')
@@ -163,6 +165,8 @@ class SettingsScreen(arcade.View):
 
         @clear_btn.event('on_click')
         def on_clear_btn_click(event):
+            self.click_sound.play()
+
             value = level_dropdown.value
 
             if not value:

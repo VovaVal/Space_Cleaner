@@ -30,6 +30,8 @@ class MenuScreen(arcade.View):
 
         if self.db.get_data_from_settings(sound_background_music=True):
             self.player_music.play()
+        elif not self.db.get_data_from_settings(sound_background_music=True):
+            arcade.stop_sound(self.player_music)
 
         self.background = arcade.load_texture(background_img_path)
         self.click_btn_sound = arcade.load_sound(btn_click_sound_path)
