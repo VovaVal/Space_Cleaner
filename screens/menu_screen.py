@@ -12,6 +12,7 @@ class MenuScreen(arcade.View):
         super().__init__()
 
         self.db = DataBase()  # подключаем/открываем базу данных
+        print(self.db.get_data_for_all_levels())
 
         self.camera = arcade.camera.Camera2D()
 

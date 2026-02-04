@@ -1,5 +1,6 @@
 import sqlite3
 from pathlib import Path
+from datetime import datetime
 
 
 class DataBase:
@@ -25,7 +26,7 @@ class DataBase:
                 CREATE TABLE IF NOT EXISTS level1 (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     score INTEGER NOT NULL,
-                    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    date STRING NOT NULL
                 )
             """)
 
@@ -33,7 +34,7 @@ class DataBase:
                 CREATE TABLE IF NOT EXISTS level2 (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     score INTEGER NOT NULL,
-                    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    date STRING NOT NULL
                 )
             """)
 
@@ -41,7 +42,7 @@ class DataBase:
                 CREATE TABLE IF NOT EXISTS level3 (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     score INTEGER NOT NULL,
-                    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    date STRING NOT NULL
                 )
             """)
 
@@ -58,7 +59,7 @@ class DataBase:
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     score INTEGER NOT NULL,
                     level INTEGER NOT NULL,
-                    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    date STRING NOT NULL
                 )
             """)
 
@@ -116,8 +117,10 @@ class DataBase:
         table_name = f'level{level}'
 
         with sqlite3.connect(self.db_path) as conn:
+            date = datetime.now().strftime(format='%d.%m.%Y')
+
             cur = conn.cursor()
-            cur.execute(f'''INSERT INTO {table_name} (score) VALUES ({score})''')
+            cur.execute(f'''INSERT INTO {table_name} (score, date) VALUES ({score}, '{date}')''')
 
             conn.commit()
 
@@ -125,9 +128,21 @@ class DataBase:
 
     def add_score_to_all_levels(self, level: int, score: int):
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute(f'''INSERT INTO all_levels_data (score, level) VALUES ({score}, {level})''')
+            date = datetime.now().strftime(format='%d.%m.%Y')
+
+            conn.execute(f'''INSERT INTO all_levels_data (score, level, date) VALUES ({score}, {level},
+            '{date}')''')
 
             conn.commit()
+
+    def get_data_for_all_levels(self):
+        with sqlite3.connect(self.db_path) as conn:
+            cur = conn.cursor()
+            level1_data = cur.execute('''SELECT score, date FROM all_levels_data WHERE level = 1''').fetchall()
+            level2_data = cur.execute('''SELECT score, date FROM all_levels_data WHERE level = 2''').fetchall()
+            level3_data = cur.execute('''SELECT score, date FROM all_levels_data WHERE level = 3''').fetchall()
+
+        return [level1_data, level2_data, level3_data]
 
     def get_scores_for_level(self, level: int):
         '''Получает по полученному уровню счёт игры'''
