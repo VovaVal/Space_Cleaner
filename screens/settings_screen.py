@@ -48,6 +48,9 @@ class SettingsScreen(arcade.View):
         def home_btn_click(event):
             self.click_sound.play()
 
+            self.manager.disable()
+            self.manager.clear()
+
             from screens.menu_screen import MenuScreen
 
             print('HOME')
