@@ -88,7 +88,7 @@ class GameScreen(arcade.View):
         )
         self.physics_engine.add_sprite(
             self.player,
-            mass=0.5,
+            mass=0.1,
             moment_of_inertia=PymunkPhysicsEngine.MOMENT_INF,
             max_velocity=500,
             friction=0.0,
