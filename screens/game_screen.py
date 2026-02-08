@@ -1,4 +1,6 @@
 import random
+import sys
+from pathlib import Path
 
 import arcade
 from arcade import PymunkPhysicsEngine
@@ -17,16 +19,16 @@ class GameScreen(arcade.View):
         self.background_speed = 2
         self.player_music = player
 
-        self.background1 = arcade.load_texture(background_img_path)
+        self.background1 = arcade.load_texture(resource_path(background_img_path))
         self.background1_y = SCREEN_HEIGHT / 2
 
-        self.background2 = arcade.load_texture(background_img_path)
+        self.background2 = arcade.load_texture(resource_path(background_img_path))
         self.background2_y = SCREEN_HEIGHT / 2 + SCREEN_HEIGHT
 
-        self.top_blackout = arcade.load_texture(blackout_top_img_path)
-        self.full_blackout = arcade.load_texture(full_blackout_img_path)
-        self.lives_img = arcade.load_texture(lives_img_path)
-        self.pause_btn_img = arcade.load_texture(pause_btn_img_path)
+        self.top_blackout = arcade.load_texture(resource_path(blackout_top_img_path))
+        self.full_blackout = arcade.load_texture(resource_path(full_blackout_img_path))
+        self.lives_img = arcade.load_texture(resource_path(lives_img_path))
+        self.pause_btn_img = arcade.load_texture(resource_path(pause_btn_img_path))
 
         self.level = level
         self.pause = False
@@ -61,9 +63,9 @@ class GameScreen(arcade.View):
         self.mouse_x = 0
         self.mouse_y = 0
 
-        self.bullet_sound = arcade.load_sound(bullet_sound_path)
-        self.destroy_sound = arcade.load_sound(destroy_sound_path)
-        self.click_sound = arcade.load_sound(btn_click_sound_path)
+        self.bullet_sound = arcade.load_sound(resource_path(bullet_sound_path))
+        self.destroy_sound = arcade.load_sound(resource_path(destroy_sound_path))
+        self.click_sound = arcade.load_sound(resource_path(btn_click_sound_path))
 
         arcade.schedule(self.create_bullet, 1.0)
         arcade.schedule(self.create_trash, self.trash_schedule)
@@ -206,7 +208,7 @@ class GameScreen(arcade.View):
         box_vertical_layout.add(label)
 
         continue_btn = UITextureButton(
-            texture=arcade.load_texture(continue_btn_img_path), scale=0.6
+            texture=arcade.load_texture(resource_path(continue_btn_img_path)), scale=0.6
         )
 
         @continue_btn.event("on_click")
@@ -221,7 +223,7 @@ class GameScreen(arcade.View):
         box_horizontal_layout.add(continue_btn)
 
         home_btn = UITextureButton(
-            texture=arcade.load_texture(home_btn_img_path), scale=0.6
+            texture=arcade.load_texture(resource_path(home_btn_img_path)), scale=0.6
         )
 
         @home_btn.event("on_click")
@@ -237,6 +239,7 @@ class GameScreen(arcade.View):
             self.ui_manager_end.clear()
 
             from screens.menu_screen import MenuScreen
+
             menu_view = MenuScreen(self.player_music)
             menu_view.setup()
             self.window.show_view(menu_view)
@@ -314,7 +317,7 @@ class GameScreen(arcade.View):
         box_vertical_layout_records.add(label5)
 
         home_btn = UITextureButton(
-            texture=arcade.load_texture(home_btn_img_path), scale=0.6
+            texture=arcade.load_texture(resource_path(home_btn_img_path)), scale=0.6
         )
 
         @home_btn.event("on_click")
@@ -330,6 +333,7 @@ class GameScreen(arcade.View):
             self.ui_manager_end.clear()
 
             from screens.menu_screen import MenuScreen
+
             menu_view = MenuScreen(self.player_music)
             menu_view.setup()
             self.window.show_view(menu_view)
@@ -339,7 +343,7 @@ class GameScreen(arcade.View):
         box_horizontal_layout.add(home_btn)
 
         play_again_btn = UITextureButton(
-            texture=arcade.load_texture(play_again_btn_img_path),
+            texture=arcade.load_texture(resource_path(play_again_btn_img_path)),
             scale=0.6
         )
 
@@ -647,8 +651,8 @@ class GameScreen(arcade.View):
 class Ship(arcade.Sprite):
     def __init__(self, db):
         super().__init__()
-        self.texture = arcade.load_texture(ship1_img_path) if db.get_data_from_settings(ship_ind=True) == 0\
-            else arcade.load_texture(ship2_img_path)
+        self.texture = arcade.load_texture(resource_path(ship1_img_path)) if db.get_data_from_settings(ship_ind=True) == 0\
+            else arcade.load_texture(resource_path(ship2_img_path))
         self.center_x = SCREEN_WIDTH / 2
         self.center_y = SCREEN_HEIGHT / 6
         self.scale = 1.0 if db.get_data_from_settings(ship_ind=True) == 0 else 1.3
@@ -658,7 +662,7 @@ class Ship(arcade.Sprite):
 class Bullet(arcade.Sprite):
     def __init__(self, x: int, y: int):
         super().__init__()
-        self.texture = arcade.load_texture(bullet_img_path)
+        self.texture = arcade.load_texture(resource_path(bullet_img_path))
         self.center_x = x
         self.center_y = y
         self.scale = 1.0
@@ -673,8 +677,8 @@ class Trash(arcade.Sprite):
 
         else:
             self.trash_class = 1 if random.random() > 0.6 else 0  # выбираем класс мусора
-        self.texture = arcade.load_texture(trash1_img_path) if self.trash_class == 0\
-            else arcade.load_texture(trash2_img_path)
+        self.texture = arcade.load_texture(resource_path(trash1_img_path)) if self.trash_class == 0\
+            else arcade.load_texture(resource_path(trash2_img_path))
         self.scale = 0.8
         self.center_x = random.randint(self.texture.width, SCREEN_WIDTH - self.texture.width)
         self.center_y = SCREEN_HEIGHT + self.texture.height
@@ -695,3 +699,12 @@ class Trash(arcade.Sprite):
     def get_class(self):
         '''Возвращает класс мусора'''
         return self.trash_class
+
+
+def resource_path(relative_path):
+    """ Получить абсолютный путь к ресурсу"""
+    try:
+        base_path = Path(sys._MEIPASS)
+    except Exception:
+        base_path = Path(__file__).parent.parent
+    return str(base_path / relative_path)

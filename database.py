@@ -1,4 +1,6 @@
+import os
 import sqlite3
+import sys
 from pathlib import Path
 from datetime import datetime
 
@@ -6,7 +8,9 @@ from datetime import datetime
 class DataBase:
     def __init__(self, db_path=None):
         if db_path is None:
-            db_path = Path(__file__).parent / 'data' / 'data.db'
+            app_data_dir = get_app_data_dir()
+            app_data_dir.mkdir(parents=True, exist_ok=True)
+            db_path = app_data_dir / 'data.db'
 
         self.db_path = Path(db_path)
 
@@ -160,3 +164,13 @@ class DataBase:
 
         except Exception as error:
             return error
+
+
+def get_app_data_dir():
+    """Возвращает путь к директории для хранения данных приложения."""
+    if sys.platform == "win32":
+        return Path(os.getenv("APPDATA")) / "SpaceCleaner"
+    elif sys.platform == "darwin":  # macOS
+        return Path.home() / "Library" / "Application Support" / "SpaceCleaner"
+    else:  # Linux
+        return Path.home() / ".local" / "share" / "SpaceCleaner"

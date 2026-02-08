@@ -1,3 +1,6 @@
+import sys
+from pathlib import Path
+
 import arcade
 from arcade.gui import UIManager, UIAnchorLayout, UIBoxLayout, UILabel, UIDropdown, UITextureButton, UIOnChangeEvent
 
@@ -27,13 +30,13 @@ class SettingsScreen(arcade.View):
         self.anchor_layout.add(self.box_layout)
         self.manager.add(self.anchor_layout)
 
-        self.background = arcade.load_texture(background_img_path)
-        self.click_sound = arcade.load_sound(btn_click_sound_path)
+        self.background = arcade.load_texture(resource_path(background_img_path))
+        self.click_sound = arcade.load_sound(resource_path(btn_click_sound_path))
 
         self.chosen_img = self.db.get_data_from_settings(ship_ind=True)  # какое изображение было выбрано
 
     def setup_widgets(self):
-        home_texture = arcade.load_texture(home_btn_icon_img_path)
+        home_texture = arcade.load_texture(resource_path(home_btn_icon_img_path))
         home_btn = UITextureButton(
             texture=home_texture,
             scale=1.0,
@@ -60,7 +63,7 @@ class SettingsScreen(arcade.View):
 
         self.manager.add(home_btn)
 
-        cup_texture = arcade.load_texture(winner_cup_btn_icon_img_path)
+        cup_texture = arcade.load_texture(resource_path(winner_cup_btn_icon_img_path))
         cup_btn = UITextureButton(
             texture=cup_texture,
             scale=1.5,
@@ -146,7 +149,7 @@ class SettingsScreen(arcade.View):
 
         imgs_choice = UIBoxLayout(vertical=False, space_between=70)
 
-        ship_texture1 = arcade.load_texture(ship1_img_path)
+        ship_texture1 = arcade.load_texture(resource_path(ship1_img_path))
         self.ship1_img = UITextureButton(
             texture=ship_texture1,
             scale=1.1
@@ -159,7 +162,7 @@ class SettingsScreen(arcade.View):
 
         imgs_choice.add(self.ship1_img)
 
-        ship_texture2 = arcade.load_texture(ship2_img_path)
+        ship_texture2 = arcade.load_texture(resource_path(ship2_img_path))
         self.ship2_img = UITextureButton(
             texture=ship_texture2,
             scale=1.5
@@ -174,7 +177,7 @@ class SettingsScreen(arcade.View):
 
         clear_records_box = UIBoxLayout(vertical=False, space_between=30)
 
-        clear_btn_texture = arcade.load_texture(clear_btn_img_path)
+        clear_btn_texture = arcade.load_texture(resource_path(clear_btn_img_path))
         clear_btn = UITextureButton(
             texture=clear_btn_texture,
             scale=0.5
@@ -315,3 +318,12 @@ class SettingsScreen(arcade.View):
                 color=arcade.color.WHITE,
                 border_width=3
             )
+
+
+def resource_path(relative_path):
+    """ Получить абсолютный путь к ресурсу"""
+    try:
+        base_path = Path(sys._MEIPASS)
+    except Exception:
+        base_path = Path(__file__).parent.parent
+    return str(base_path / relative_path)

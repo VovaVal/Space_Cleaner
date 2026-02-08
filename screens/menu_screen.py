@@ -1,3 +1,6 @@
+import sys
+from pathlib import Path
+
 import arcade
 from arcade.gui import UIManager, UIAnchorLayout, UIBoxLayout, UILabel, UITextureButton
 
@@ -34,8 +37,8 @@ class MenuScreen(arcade.View):
         elif not self.db.get_data_from_settings(sound_background_music=True):
             arcade.stop_sound(self.player_music)
 
-        self.background = arcade.load_texture(background_img_path)
-        self.click_btn_sound = arcade.load_sound(btn_click_sound_path)
+        self.background = arcade.load_texture(resource_path(background_img_path))
+        self.click_btn_sound = arcade.load_sound(resource_path(btn_click_sound_path))
 
     def setup_widgets(self):
         label = UILabel(text='Space Cleaner', font_size=48, text_color=arcade.color.WHITE, align='center')
@@ -46,19 +49,19 @@ class MenuScreen(arcade.View):
 
         buttons_box = UIBoxLayout(vertical=True, space_between=40)
 
-        texture_normal1 = arcade.load_texture(button_level1_img_path)
+        texture_normal1 = arcade.load_texture(resource_path(button_level1_img_path))
         level1_btn = UITextureButton(
             texture=texture_normal1,
             scale=1.0
         )
 
-        texture_normal2 = arcade.load_texture(button_level2_img_path)
+        texture_normal2 = arcade.load_texture(resource_path(button_level2_img_path))
         level2_btn = UITextureButton(
             texture=texture_normal2,
             scale=1.0
         )
 
-        texture_normal3 = arcade.load_texture(button_level3_img_path)
+        texture_normal3 = arcade.load_texture(resource_path(button_level3_img_path))
         level3_btn = UITextureButton(
             texture=texture_normal3,
             scale=1.0
@@ -70,7 +73,7 @@ class MenuScreen(arcade.View):
 
         settings_box = UIBoxLayout(vertical=True, space_between=50)
 
-        texture_settings = arcade.load_texture(settings_btn_img_path)
+        texture_settings = arcade.load_texture(resource_path(settings_btn_img_path))
         settings_btn = UITextureButton(
             texture=texture_settings,
             scale=1.0
@@ -129,3 +132,12 @@ class MenuScreen(arcade.View):
 
     def on_update(self, delta_time: float) -> bool | None:
         pass
+
+
+def resource_path(relative_path):
+    """ Получить абсолютный путь к ресурсу"""
+    try:
+        base_path = Path(sys._MEIPASS)
+    except Exception:
+        base_path = Path(__file__).parent.parent
+    return str(base_path / relative_path)
